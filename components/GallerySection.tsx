@@ -2,22 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { usePublicClient } from "wagmi";
-import { MAX_SUPPLY, NFT_ABI, NFT_CONTRACT_ADDRESS } from "@/lib/contract";
-
-/**
- * IPFS Helper for Gallery
- */
-function normalizeIpfs(uri: string, gatewayIndex = 0): string {
-  if (!uri) return "";
-  const gateways = [
-    "https://cloudflare-ipfs.com/ipfs/",
-    "https://ipfs.io/ipfs/",
-    "https://gateway.pinata.cloud/ipfs/",
-  ];
-  const cleanUri = uri.startsWith("ipfs://") ? uri.slice("ipfs://".length) : uri;
-  if (cleanUri.startsWith("http")) return cleanUri;
-  return `${gateways[gatewayIndex % gateways.length]}${cleanUri}`;
-}
+import { resolveMintedNft } from "@/lib/nftMetadata";
 
 /** Generate placeholder NFT image colors deterministically from token ID */
 function getTokenColor(tokenId: number): string {
@@ -39,23 +24,15 @@ function NFTCard({ tokenId, isMinted }: { tokenId: number; isMinted: boolean }) 
         return;
       }
       try {
-        const tokenURI = await publicClient.readContract({
-          address: NFT_CONTRACT_ADDRESS,
-          abi: NFT_ABI,
-          functionName: "tokenURI",
-          args: [BigInt(tokenId)],
-        });
+        for (let attempt = 1; attempt <= 3; attempt++) {
+          const nft = await resolveMintedNft(publicClient, tokenId);
+          if (nft?.image) {
+            setImage(nft.image);
+            break;
+          }
 
-        // Try gateways
-        for (let g = 0; g < 2; g++) {
-          const metaUrl = normalizeIpfs(tokenURI as string, g);
-          const res = await fetch(metaUrl, { signal: AbortSignal.timeout(5000) });
-          if (res.ok) {
-            const meta = await res.json();
-            if (meta.image) {
-              setImage(normalizeIpfs(meta.image, g));
-              break;
-            }
+          if (attempt < 3) {
+            await new Promise((resolve) => setTimeout(resolve, 600 * attempt));
           }
         }
       } catch (err) {

@@ -75,3 +75,5 @@ export function useMintProgress() {
     refresh,
   };
 }
+
+export type MintProgressState = ReturnType<typeof useMintProgress>;

@@ -5,42 +5,51 @@ import { toast } from "react-hot-toast";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ritualChain } from "@/lib/chain";
 import { useMint } from "@/hooks/useMint";
-import { useMintProgress } from "@/hooks/useMintProgress";
+import { type MintProgressState } from "@/hooks/useMintProgress";
 import { MAX_SUPPLY, MINT_PRICE_ETH, NFT_ABI, NFT_CONTRACT_ADDRESS } from "@/lib/contract";
 import { type MintedNft, resolveMintedNft } from "@/lib/nftMetadata";
 
 /** MintSection — progress bar, mint button, stats panel */
-export function MintSection() {
+export function MintSection({ mintProgress }: { mintProgress: MintProgressState }) {
   const { isConnected, chain, address } = useAccount();
   const publicClient = usePublicClient();
   const { switchChain, isPending: isSwitching } = useSwitchChain();
   const isWrongChain = isConnected && chain?.id !== ritualChain.id;
 
   const { minted, remaining, isSoldOut, progress, isLoading: isProgressLoading, refresh } =
-    useMintProgress();
+    mintProgress;
 
   const [walletMintedNft, setWalletMintedNft] = useState<MintedNft | null>(null);
   const [isWalletMintCheckLoading, setIsWalletMintCheckLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [hasMintedOnChain, setHasMintedOnChain] = useState(false);
 
-  const hasMintedAlready = Boolean(walletMintedNft);
+  const hasMintedAlready = hasMintedOnChain || Boolean(walletMintedNft);
 
   const loadWalletMintState = useCallback(
     async (forceOpenModal: boolean) => {
       if (!address || !publicClient) {
         setWalletMintedNft(null);
         setIsModalOpen(false);
+        setHasMintedOnChain(false);
         return;
       }
 
       setIsWalletMintCheckLoading(true);
 
       try {
+        const mintedFlag = await readHasMintedWithRetry(publicClient, address);
+        setHasMintedOnChain(mintedFlag);
+
+        if (!mintedFlag) {
+          setWalletMintedNft(null);
+          setIsModalOpen(false);
+          return;
+        }
+
         const ownedTokenId = await resolveOwnedTokenId(publicClient, address);
 
         if (!ownedTokenId) {
-          setWalletMintedNft(null);
-          setIsModalOpen(false);
           return;
         }
 
@@ -433,6 +442,27 @@ async function resolveOwnedTokenId(
   }
 
   return null;
+}
+
+async function readHasMintedWithRetry(
+  publicClient: NonNullable<ReturnType<typeof usePublicClient>>,
+  walletAddress: `0x${string}`
+): Promise<boolean> {
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      return await publicClient.readContract({
+        address: NFT_CONTRACT_ADDRESS,
+        abi: NFT_ABI,
+        functionName: "hasMinted",
+        args: [walletAddress],
+      });
+    } catch {
+      if (attempt === 3) return false;
+      await new Promise((resolve) => setTimeout(resolve, 400 * attempt));
+    }
+  }
+
+  return false;
 }
 
 function StatCard({
