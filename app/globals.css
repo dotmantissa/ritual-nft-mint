@@ -1,0 +1,233 @@
+@import "tailwindcss";
+
+/* =============================================
+   Ritual Design System — CSS Custom Properties
+   ============================================= */
+:root {
+  --font-display: "Archivo Black", system-ui, sans-serif;
+  --font-body: "Barlow", "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", monospace;
+
+  /* Color tokens */
+  --color-green: #19d184;
+  --color-lime: #bfff00;
+  --color-pink: #ff1dce;
+  --color-gold: #facc15;
+  --color-red: #ef4444;
+  --color-elevated: #111827;
+  --color-surface: #1f2937;
+}
+
+/* Global base */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: #000000;
+  color: #d1d5db;
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Typography helpers */
+.font-display {
+  font-family: var(--font-display);
+}
+.font-body {
+  font-family: var(--font-body);
+}
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+/* =============================================
+   Ritual Animations
+   ============================================= */
+
+@keyframes pulse-green {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(25, 209, 132, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(25, 209, 132, 0);
+  }
+}
+
+@keyframes glow-green {
+  0%,
+  100% {
+    text-shadow: 0 0 8px rgba(25, 209, 132, 0.5);
+  }
+  50% {
+    text-shadow: 0 0 20px rgba(25, 209, 132, 0.8);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bar-fill {
+  from {
+    width: 0%;
+  }
+}
+
+@keyframes scan-line {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(400%);
+  }
+}
+
+.animate-pulse-green {
+  animation: pulse-green 2s ease-in-out infinite;
+}
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+.animate-fade-in {
+  animation: fade-in 0.4s ease-out both;
+}
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 25%,
+    rgba(25, 209, 132, 0.08) 50%,
+    transparent 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s linear infinite;
+}
+
+/* =============================================
+   Ritual Progress Bar
+   ============================================= */
+.ritual-progress-track {
+  background: #1f2937;
+  border-radius: 9999px;
+  overflow: hidden;
+  position: relative;
+  height: 12px;
+}
+
+.ritual-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #19d184, #bfff00);
+  border-radius: 9999px;
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.ritual-progress-fill::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 40px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  animation: shimmer 1.5s linear infinite;
+}
+
+/* =============================================
+   NFT Card
+   ============================================= */
+.nft-card {
+  background: #111827;
+  border: 1px solid #374151;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.2s ease, border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.nft-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(25, 209, 132, 0.4);
+  box-shadow: 0 0 30px -5px rgba(25, 209, 132, 0.2);
+}
+
+/* =============================================
+   Mesh gradient background
+   ============================================= */
+.ritual-mesh {
+  background: radial-gradient(
+      ellipse 80% 50% at 50% -20%,
+      rgba(25, 209, 132, 0.08),
+      transparent
+    ),
+    radial-gradient(
+      ellipse 60% 40% at 80% 80%,
+      rgba(255, 29, 206, 0.05),
+      transparent
+    ),
+    #000000;
+}
+
+/* =============================================
+   Scrollbar
+   ============================================= */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #000;
+}
+::-webkit-scrollbar-thumb {
+  background: #374151;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #19d184;
+}
+
+/* =============================================
+   Focus rings (Ritual standard)
+   ============================================= */
+:focus-visible {
+  outline: 2px solid rgba(25, 209, 132, 0.5);
+  outline-offset: 2px;
+}

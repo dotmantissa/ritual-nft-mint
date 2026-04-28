@@ -1,0 +1,47 @@
+{
+  "name": "62",
+  "description": "",
+  "external_url": "",
+  "image": "ipfs://bafybeicu64g7c573o6xiso64ohct3s4wmhjzgio6dqt4mnrhqs5ylbc2pe/62.png",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Ivory"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Body"
+    },
+    {
+      "trait_type": "Shirt",
+      "value": "Ritual Merch"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Fish"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Pirate"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Pirate"
+    },
+    {
+      "trait_type": "Ritual",
+      "value": "Yellow"
+    }
+  ],
+  "properties": {
+    "files": [
+      {
+        "uri": "ipfs://bafybeicu64g7c573o6xiso64ohct3s4wmhjzgio6dqt4mnrhqs5ylbc2pe/62.png",
+        "type": "image/png"
+      }
+    ],
+    "category": "image",
+    "creators": []
+  },
+  "compiler": "NFTexport.io"
+}

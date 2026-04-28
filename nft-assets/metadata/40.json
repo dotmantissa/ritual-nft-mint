@@ -1,0 +1,47 @@
+{
+  "name": "40",
+  "description": "",
+  "external_url": "",
+  "image": "ipfs://bafybeicu64g7c573o6xiso64ohct3s4wmhjzgio6dqt4mnrhqs5ylbc2pe/40.png",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Lavender"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Body"
+    },
+    {
+      "trait_type": "Shirt",
+      "value": "Hoodie"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Angry"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Pirate"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Beanie"
+    },
+    {
+      "trait_type": "Ritual",
+      "value": "Yellow"
+    }
+  ],
+  "properties": {
+    "files": [
+      {
+        "uri": "ipfs://bafybeicu64g7c573o6xiso64ohct3s4wmhjzgio6dqt4mnrhqs5ylbc2pe/40.png",
+        "type": "image/png"
+      }
+    ],
+    "category": "image",
+    "creators": []
+  },
+  "compiler": "NFTexport.io"
+}

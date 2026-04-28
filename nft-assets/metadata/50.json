@@ -1,0 +1,47 @@
+{
+  "name": "50",
+  "description": "",
+  "external_url": "",
+  "image": "ipfs://bafybeicu64g7c573o6xiso64ohct3s4wmhjzgio6dqt4mnrhqs5ylbc2pe/50.png",
+  "attributes": [
+    {
+      "trait_type": "Background",
+      "value": "Rose"
+    },
+    {
+      "trait_type": "Body",
+      "value": "Body"
+    },
+    {
+      "trait_type": "Shirt",
+      "value": "Ritual Merch"
+    },
+    {
+      "trait_type": "Mouth",
+      "value": "Fish"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Closed"
+    },
+    {
+      "trait_type": "Hat",
+      "value": "Durag"
+    },
+    {
+      "trait_type": "Ritual",
+      "value": "Green"
+    }
+  ],
+  "properties": {
+    "files": [
+      {
+        "uri": "ipfs://bafybeicu64g7c573o6xiso64ohct3s4wmhjzgio6dqt4mnrhqs5ylbc2pe/50.png",
+        "type": "image/png"
+      }
+    ],
+    "category": "image",
+    "creators": []
+  },
+  "compiler": "NFTexport.io"
+}

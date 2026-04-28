@@ -1,0 +1,51 @@
+{
+  "intent": "build",
+  "features": [
+    "ERC-721 NFT collection (supply: 99)",
+    "Wallet connection (MetaMask + WalletConnect)",
+    "Mint button with transaction lifecycle",
+    "Progress bar (minted / 99) with 30s auto-refresh",
+    "Gallery grid with placeholder generative art",
+    "Toast notifications (success / error)",
+    "Chain guard (Ritual Chain 1979)",
+    "Dark-mode Ritual design system"
+  ],
+  "current_phase": 3,
+  "phases": [
+    { "phase": 0, "name": "Intake", "status": "complete" },
+    { "phase": 1, "name": "Architecture", "status": "complete" },
+    { "phase": 2, "name": "Smart Contracts", "status": "complete" },
+    { "phase": 3, "name": "Frontend", "status": "complete" },
+    { "phase": 4, "name": "Integration", "status": "complete" },
+    { "phase": 5, "name": "Verification", "status": "complete" }
+  ],
+  "files_read": [
+    "skills/ritual/SKILL.md",
+    "skills/ritual-meta-projection/SKILL.md",
+    "agents/ritual-dapp-builder.md",
+    "skills/ritual-dapp-frontend/SKILL.md",
+    "skills/ritual-dapp-design/SKILL.md",
+    "skills/ritual-dapp-deploy/SKILL.md",
+    "skills/ritual-dapp-contracts/SKILL.md",
+    "templates/nextjs-starter/package.json.tmpl"
+  ],
+  "next_file": null,
+  "markers": {
+    "chain_connection": true,
+    "wallet_funded": false,
+    "contract_compiled": false,
+    "contract_deployed": false,
+    "precompile_simulated": false,
+    "precompile_settled": false,
+    "frontend_renders": true,
+    "frontend_connects": true,
+    "e2e_complete": false
+  },
+  "artifacts": {
+    "frontend": "ritual-nft-mint/",
+    "contract": "ritual-nft-mint/contracts/src/RitualGenesis.sol",
+    "deploy_script": "ritual-nft-mint/contracts/script/Deploy.s.sol",
+    "readme": "ritual-nft-mint/README.md"
+  },
+  "notes": "contract_deployed and e2e_complete require deployer to run: forge script script/Deploy.s.sol:Deploy --rpc-url https://rpc.ritualfoundation.org --broadcast. Then set NEXT_PUBLIC_NFT_CONTRACT in .env.local."
+}
