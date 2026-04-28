@@ -36,19 +36,6 @@ export function MintSection() {
       setIsWalletMintCheckLoading(true);
 
       try {
-        const hasMintedOnChain = await publicClient.readContract({
-          address: NFT_CONTRACT_ADDRESS,
-          abi: NFT_ABI,
-          functionName: "hasMinted",
-          args: [address],
-        });
-
-        if (!hasMintedOnChain) {
-          setWalletMintedNft(null);
-          setIsModalOpen(false);
-          return;
-        }
-
         const ownedTokenId = await resolveOwnedTokenId(publicClient, address);
 
         if (!ownedTokenId) {
@@ -430,13 +417,22 @@ async function resolveOwnedTokenId(
   publicClient: NonNullable<ReturnType<typeof usePublicClient>>,
   walletAddress: `0x${string}`
 ): Promise<number | null> {
-  const supply = await publicClient.readContract({
-    address: NFT_CONTRACT_ADDRESS,
-    abi: NFT_ABI,
-    functionName: "totalSupply",
-  });
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const supply = await publicClient.readContract({
+        address: NFT_CONTRACT_ADDRESS,
+        abi: NFT_ABI,
+        functionName: "totalSupply",
+      });
 
-  return findOwnedTokenId(publicClient, walletAddress, Number(supply));
+      return await findOwnedTokenId(publicClient, walletAddress, Number(supply));
+    } catch {
+      if (attempt === 3) return null;
+      await new Promise((resolve) => setTimeout(resolve, 400 * attempt));
+    }
+  }
+
+  return null;
 }
 
 function StatCard({
