@@ -8,7 +8,7 @@ import { type Abi } from "viem";
 
 export const NFT_CONTRACT_ADDRESS =
   (process.env.NEXT_PUBLIC_NFT_CONTRACT as `0x${string}`) ??
-  "0x450Dd113875a7a2A7E404EdfebEc884D9c769881";
+  "0xb26e453CAF6EAa68248447052A0AC75a84650312";
 
 /** Total number of NFTs in the collection */
 export const MAX_SUPPLY = 99;
