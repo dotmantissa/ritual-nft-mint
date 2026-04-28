@@ -83,12 +83,24 @@ export function MintSection() {
         setIsModalOpen(true);
       }
 
-      if (!mintedNft) {
+      // Always re-hydrate from chain so modal shows real tokenURI metadata
+      // (image + traits), even if first pass resolved only minimal data.
+      setTimeout(() => {
         void loadWalletMintState(true);
-      }
+      }, 1200);
 
-      // Immediately refresh supply after a mint
-      setTimeout(() => refresh(), 3000);
+      // Force several supply refreshes after mint confirmation to keep
+      // counter/progress/recent mints in sync across RPC/indexing delays.
+      void refresh();
+      setTimeout(() => {
+        void refresh();
+      }, 1500);
+      setTimeout(() => {
+        void refresh();
+      }, 3500);
+      setTimeout(() => {
+        void refresh();
+      }, 7000);
     },
   });
 

@@ -20,10 +20,10 @@ export function useMintProgress() {
     abi: NFT_ABI,
     functionName: "totalSupply",
     query: {
-      // Auto-refresh every 10 seconds as a fallback
-      refetchInterval: 10_000,
+      // Auto-refresh frequently as a fallback
+      refetchInterval: 5_000,
       // Show stale data while refetching
-      staleTime: 8_000,
+      staleTime: 4_000,
     },
   });
 
