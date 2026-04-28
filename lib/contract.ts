@@ -8,7 +8,7 @@ import { type Abi } from "viem";
 
 export const NFT_CONTRACT_ADDRESS =
   (process.env.NEXT_PUBLIC_NFT_CONTRACT as `0x${string}`) ??
-  "0x046A164b717893D57EC4ab3E570a90A7ef4804e4";
+  "0x05B4c673b855e78d45f3C36972E20e92c724db5e";
 
 /** Total number of NFTs in the collection */
 export const MAX_SUPPLY = 99;
@@ -59,6 +59,13 @@ export const NFT_ABI = [
     name: "ownerOf",
     inputs: [{ name: "tokenId", type: "uint256" }],
     outputs: [{ name: "", type: "address" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "hasMinted",
+    inputs: [{ name: "wallet", type: "address" }],
+    outputs: [{ name: "", type: "bool" }],
     stateMutability: "view",
   },
   {

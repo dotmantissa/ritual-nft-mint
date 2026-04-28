@@ -115,7 +115,24 @@ export function useMint({
           resolvedMintedNft = (await resolveMintedNft(publicClient, tokenId)) ?? undefined;
         } catch {
           // Mint can still succeed even if metadata resolution fails.
-          resolvedMintedNft = undefined;
+          // Keep a minimal token record so the UI can still enforce one mint per wallet
+          // and recover full metadata in a follow-up on-chain read.
+          try {
+            const decoded = decodeEventLog({
+              abi: NFT_ABI,
+              data: transferLog.data,
+              topics: transferLog.topics,
+            });
+            const tokenId = Number(decoded.args.tokenId);
+            resolvedMintedNft = {
+              tokenId,
+              tokenURI: "",
+              metadataURI: "",
+              attributes: [],
+            };
+          } catch {
+            resolvedMintedNft = undefined;
+          }
         }
       }
 

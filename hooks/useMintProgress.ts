@@ -1,8 +1,6 @@
 "use client";
 
-import { useReadContract } from "wagmi";
-import { parseEther } from "viem";
-import { useEffect, useRef, useState } from "react";
+import { useReadContract, useWatchBlockNumber } from "wagmi";
 import { NFT_ABI, NFT_CONTRACT_ADDRESS, MAX_SUPPLY } from "@/lib/contract";
 
 /**
@@ -22,10 +20,17 @@ export function useMintProgress() {
     abi: NFT_ABI,
     functionName: "totalSupply",
     query: {
-      // Auto-refresh every 30 seconds
-      refetchInterval: 30_000,
+      // Auto-refresh every 10 seconds as a fallback
+      refetchInterval: 10_000,
       // Show stale data while refetching
-      staleTime: 25_000,
+      staleTime: 8_000,
+    },
+  });
+
+  // Keep progress reactive to mints from other wallets by refetching on each new block.
+  useWatchBlockNumber({
+    onBlockNumber: () => {
+      void refetch();
     },
   });
 

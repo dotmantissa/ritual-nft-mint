@@ -127,9 +127,9 @@ function NFTCard({ tokenId, isMinted }: { tokenId: number; isMinted: boolean }) 
  * GallerySection — shows real NFT cards from the blockchain.
  */
 export function GallerySection({ mintedCount }: { mintedCount: number }) {
-  // Show recently minted + some previews (max 12 visible)
-  const visibleCount = Math.min(Math.max(mintedCount, 6), 12);
-  const tokenIds = Array.from({ length: visibleCount }, (_, i) => i + 1);
+  // Show the most recently minted token IDs first (max 12).
+  const mintedVisibleCount = Math.min(mintedCount, 12);
+  const recentMintedTokenIds = Array.from({ length: mintedVisibleCount }, (_, i) => mintedCount - i);
 
   return (
     <section className="max-w-6xl mx-auto px-4 sm:px-6 pb-24">
@@ -146,12 +146,12 @@ export function GallerySection({ mintedCount }: { mintedCount: number }) {
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-        {tokenIds.map((id) => (
-          <NFTCard key={id} tokenId={id} isMinted={id <= mintedCount} />
+        {recentMintedTokenIds.map((id) => (
+          <NFTCard key={id} tokenId={id} isMinted />
         ))}
 
         {/* Locked slots */}
-        {Array.from({ length: Math.max(0, 6 - visibleCount) }, (_, i) => (
+        {Array.from({ length: Math.max(0, 6 - mintedVisibleCount) }, (_, i) => (
           <div
             key={`locked-${i}`}
             className="nft-card aspect-square flex flex-col items-center justify-center text-gray-700"

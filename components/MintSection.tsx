@@ -2,14 +2,12 @@
 
 import { useAccount, usePublicClient, useSwitchChain } from "wagmi";
 import { toast } from "react-hot-toast";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { ritualChain } from "@/lib/chain";
 import { useMint } from "@/hooks/useMint";
 import { useMintProgress } from "@/hooks/useMintProgress";
 import { MAX_SUPPLY, MINT_PRICE_ETH, NFT_ABI, NFT_CONTRACT_ADDRESS } from "@/lib/contract";
 import { type MintedNft, resolveMintedNft } from "@/lib/nftMetadata";
-
-const MINTED_CACHE_PREFIX = "ritual-minted:";
 
 /** MintSection — progress bar, mint button, stats panel */
 export function MintSection() {
@@ -27,14 +25,66 @@ export function MintSection() {
 
   const hasMintedAlready = Boolean(walletMintedNft);
 
+  const loadWalletMintState = useCallback(
+    async (forceOpenModal: boolean) => {
+      if (!address || !publicClient) {
+        setWalletMintedNft(null);
+        setIsModalOpen(false);
+        return;
+      }
+
+      setIsWalletMintCheckLoading(true);
+
+      try {
+        const hasMintedOnChain = await publicClient.readContract({
+          address: NFT_CONTRACT_ADDRESS,
+          abi: NFT_ABI,
+          functionName: "hasMinted",
+          args: [address],
+        });
+
+        if (!hasMintedOnChain) {
+          setWalletMintedNft(null);
+          setIsModalOpen(false);
+          return;
+        }
+
+        const ownedTokenId = await resolveOwnedTokenId(publicClient, address);
+
+        if (!ownedTokenId) {
+          setWalletMintedNft(null);
+          setIsModalOpen(false);
+          return;
+        }
+
+        const mintedNft = await resolveMintedNft(publicClient, ownedTokenId);
+        if (!mintedNft) return;
+
+        setWalletMintedNft(mintedNft);
+
+        if (forceOpenModal) {
+          setIsModalOpen(true);
+        }
+      } catch {
+        // Ignore check failures; user can still interact with mint UI.
+      } finally {
+        setIsWalletMintCheckLoading(false);
+      }
+    },
+    [address, publicClient]
+  );
+
   const { mint, status, txHash, errorMessage, isLoading } = useMint({
     isSoldOut,
     hasMintedAlready,
     onSuccess: (mintedNft) => {
       if (mintedNft && address) {
         setWalletMintedNft(mintedNft);
-        saveCachedMintedNft(address, mintedNft);
         setIsModalOpen(true);
+      }
+
+      if (!mintedNft) {
+        void loadWalletMintState(true);
       }
 
       // Immediately refresh supply after a mint
@@ -44,66 +94,17 @@ export function MintSection() {
 
   useEffect(() => {
     let ignore = false;
-
-    const loadWalletMintState = async () => {
-      if (!address || !publicClient) {
-        if (!ignore) {
-          setWalletMintedNft(null);
-          setIsModalOpen(false);
-        }
-        return;
-      }
-
-      setIsWalletMintCheckLoading(true);
-
-      try {
-        const cached = readCachedMintedNft(address);
-        if (cached && !ignore) {
-          setWalletMintedNft(cached);
-          setIsModalOpen(true);
-          setIsWalletMintCheckLoading(false);
-          return;
-        }
-
-        const supply = await publicClient.readContract({
-          address: NFT_CONTRACT_ADDRESS,
-          abi: NFT_ABI,
-          functionName: "totalSupply",
-        });
-
-        const ownedTokenId = await findOwnedTokenId(publicClient, address, Number(supply));
-
-        if (!ownedTokenId) {
-          if (!ignore) {
-            setWalletMintedNft(null);
-            setIsModalOpen(false);
-          }
-          return;
-        }
-
-        const mintedNft = await resolveMintedNft(publicClient, ownedTokenId);
-        if (!mintedNft) return;
-
-        if (!ignore) {
-          setWalletMintedNft(mintedNft);
-          setIsModalOpen(true);
-          saveCachedMintedNft(address, mintedNft);
-        }
-      } catch {
-        // Ignore check failures; user can still interact with mint UI.
-      } finally {
-        if (!ignore) {
-          setIsWalletMintCheckLoading(false);
-        }
-      }
+    const run = async () => {
+      await loadWalletMintState(true);
     };
-
-    loadWalletMintState();
+    if (!ignore) {
+      void run();
+    }
 
     return () => {
       ignore = true;
     };
-  }, [address, publicClient]);
+  }, [loadWalletMintState]);
 
   const downloadMintedNft = async () => {
     if (!walletMintedNft?.image) return;
@@ -388,45 +389,6 @@ export function MintSection() {
   );
 }
 
-function getCacheKey(walletAddress: string): string {
-  return `${MINTED_CACHE_PREFIX}${NFT_CONTRACT_ADDRESS.toLowerCase()}:${walletAddress.toLowerCase()}`;
-}
-
-function saveCachedMintedNft(walletAddress: string, mintedNft: MintedNft) {
-  if (typeof window === "undefined") return;
-
-  const payload = {
-    tokenId: mintedNft.tokenId,
-    tokenURI: mintedNft.tokenURI,
-    metadataURI: mintedNft.metadataURI,
-    name: mintedNft.name,
-    description: mintedNft.description,
-    image: mintedNft.image,
-    attributes: mintedNft.attributes,
-  } satisfies MintedNft;
-
-  localStorage.setItem(getCacheKey(walletAddress), JSON.stringify(payload));
-}
-
-function readCachedMintedNft(walletAddress: string): MintedNft | null {
-  if (typeof window === "undefined") return null;
-
-  const raw = localStorage.getItem(getCacheKey(walletAddress));
-  if (!raw) return null;
-
-  try {
-    const parsed = JSON.parse(raw) as MintedNft;
-
-    if (!parsed || typeof parsed.tokenId !== "number" || !Array.isArray(parsed.attributes)) {
-      return null;
-    }
-
-    return parsed;
-  } catch {
-    return null;
-  }
-}
-
 async function findOwnedTokenId(
   publicClient: NonNullable<ReturnType<typeof usePublicClient>>,
   walletAddress: `0x${string}`,
@@ -450,6 +412,19 @@ async function findOwnedTokenId(
   }
 
   return null;
+}
+
+async function resolveOwnedTokenId(
+  publicClient: NonNullable<ReturnType<typeof usePublicClient>>,
+  walletAddress: `0x${string}`
+): Promise<number | null> {
+  const supply = await publicClient.readContract({
+    address: NFT_CONTRACT_ADDRESS,
+    abi: NFT_ABI,
+    functionName: "totalSupply",
+  });
+
+  return findOwnedTokenId(publicClient, walletAddress, Number(supply));
 }
 
 function StatCard({
